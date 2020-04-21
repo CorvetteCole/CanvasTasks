@@ -4,11 +4,14 @@ library oauth2;
 import 'package:js/js.dart';
 import 'cache.dart';
 import 'lock.dart';
+import 'properties.dart';
 
 @JS()
 class OAuth2 {
   external static Service_ createService(String serviceName);
+
   external static String getRedirectUri([String optScriptId]);
+
   external static List<String> get TOKEN_FORMAT;
 }
 
@@ -31,6 +34,7 @@ class Service_ {
   external String getRedirectUri();
 
   external Storage_ getStorage();
+
   external Object getToken([bool optSkipMemoryCheck]); // might not work
   external bool handleCallback(Object callbackRequest);
 
@@ -40,10 +44,12 @@ class Service_ {
 
   external void reset();
 
-  //external Service_ setAdditionalClaims()  dunno how to implement, not using so not worth spending time on
+  //external Service_ setAdditionalClaims(); wants Object.<string, string>, not sure how to implement
+
   external Service_ setAuthorizationBaseUrl(String authorizationBaseUrl);
 
   external Service_ setCache(Cache cache);
+
   external Service_ setCallbackFunction(String callbackFunctionName);
 
   external Service_ setClientId(String clientId);
@@ -57,11 +63,13 @@ class Service_ {
   external Service_ setIssuer(String issuer);
 
   external Service_ setLock(Lock lock);
+
   external Service_ setParam(String name, String value);
 
   external Service_ setPrivateKey(String privateKey);
 
-  external Service_ setPropertyStore(PropertiesService.Properties propertyStore);
+  external Service_ setPropertyStore(Properties propertyStore);
+
   external Service_ setRedirectUri(String redirectUri);
 
   external Service_ setRefreshUrl(String refreshUrl);
@@ -70,19 +78,42 @@ class Service_ {
 
   external Service_ setSubject(String subject);
 
-  external Service_ setTokenFormat(OAuth2.TOKEN_FORMAT);
-  external Service_ setTokenHeaders(Object.<string,string> tokenHeaders);
-  external Service_ setTokenPayloadHandler(tokenHandler tokenHandler);
+  external Service_ setTokenFormat(
+      String TOKEN_FORMAT); //JSON or FORM_URL_ENCODED
+  //external Service_ setTokenHeaders(Object.<string,string> tokenHeaders); wants Object.<string, string>, not sure how to implement
+  //external Service_ setTokenPayloadHandler(tokenHandler tokenHandler);
   external Service_ setTokenUrl(String tokenUrl);
 }
 
 @JS()
-class Storage_ {
-  external Storage_(String prefix,
-      [PropertiesService.Properties optProperties,
-      Cache optCache]);
+class tokenPayload {
+  external String get code;
 
-  external dynamic getValue(String key, [bool optSkipMemoryCheck]); // might not work
+  external String get client_id;
+
+  external String get client_secret;
+
+  external String get redirect_uri;
+
+  external String get grant_type;
+
+  external set code(String value);
+
+  external set client_id(String value);
+
+  external set client_secret(String value);
+
+  external set redirect_uri(String value);
+
+  external set grant_type(String value);
+}
+
+@JS()
+class Storage_ {
+  external Storage_(String prefix, [Properties optProperties, Cache optCache]);
+
+  external dynamic getValue(String key,
+      [bool optSkipMemoryCheck]); // might not work
 
   external void removeValue(String key);
 

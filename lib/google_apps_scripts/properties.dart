@@ -7,9 +7,9 @@ import 'package:js/js.dart';
 
 @JS()
 class PropertiesService {
-  external Properties getDocumentProperties();
-  external Properties getScriptProperties();
-  external Properties getUserProperties();
+  external static Properties getDocumentProperties();
+  external static Properties getScriptProperties();
+  external static Properties getUserProperties();
 }
 
 @JS()

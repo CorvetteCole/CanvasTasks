@@ -7,6 +7,26 @@ import 'package:CanvasTasks/models/assignment/LockInfo.dart';
 import 'package:CanvasTasks/models/assignment/RubricCriteria.dart';
 import 'package:CanvasTasks/models/assignment/RubricRating.dart';
 import 'package:CanvasTasks/models/assignment/TurnitinSettings.dart';
+import 'package:CanvasTasks/models/submission/submission.dart';
+
+
+enum SubmissionType{
+  discussion_topic,
+  online_quiz,
+  on_paper,
+  none,
+  external_tool,
+  online_text_entry,
+  online_url,
+  online_upload,
+  media_recording
+}
+
+extension ParseToString on SubmissionType {
+  String toShortString() {
+    return this.toString().split('.').last;
+  }
+}
 
 class Assignment {
   int id;
@@ -63,7 +83,7 @@ class Assignment {
   bool frozen;
   List<String> frozenAttributes;
 
-  //Null submission;
+  Submission submission;
   bool useRubricForGrading;
   RubricSettings rubricSettings;
   List<RubricCriteria> rubric;
@@ -133,7 +153,7 @@ class Assignment {
       this.freezeOnCopy,
       this.frozen,
       this.frozenAttributes,
-      //this.submission,
+      this.submission,
       this.useRubricForGrading,
       this.rubricSettings,
       this.rubric,
@@ -220,7 +240,7 @@ class Assignment {
     freezeOnCopy = json['freeze_on_copy'];
     frozen = json['frozen'];
     frozenAttributes = json['frozen_attributes']?.cast<String>();
-    //submission = json['submission'];
+    submission = json['submission'] != null ? Submission.fromJson(json['submission']) : null;
     useRubricForGrading = json['use_rubric_for_grading'];
     rubricSettings = json['rubric_settings'] != null
         ? RubricSettings.fromJson(json['rubric_settings'])
@@ -305,7 +325,7 @@ class Assignment {
     data['freeze_on_copy'] = this.freezeOnCopy;
     data['frozen'] = this.frozen;
     data['frozen_attributes'] = this.frozenAttributes;
-    //data['submission'] = this.submission;
+    data['submission'] = this.submission;
     data['use_rubric_for_grading'] = this.useRubricForGrading;
     if (this.rubricSettings != null) {
       data['rubric_settings'] = this.rubricSettings.toJson();
@@ -327,6 +347,40 @@ class Assignment {
     data['allowed_attempts'] = this.allowedAttempts;
     data['post_manually'] = this.postManually;
     return data;
+  }
+
+  bool get isComplete {
+    print(
+        'evaluating assignment: ${name} lockedForUser: ${lockedForUser}');
+    if (submission != null) {
+      print(
+          'submission is not null. workflowState: "${submission.workflowState}" gradedAt: "${submission.gradedAt}" visible: "${submission.assignmentVisible}"');
+      if (submission.workflowState ==
+          WorkFlowState.submitted.toShortString() ||
+          submission.workflowState ==
+              WorkFlowState.graded.toShortString()) {
+        return true;
+      } else if (submission.gradedAt?.isNotEmpty ?? false) {
+        return true;
+      } else if (!(submission.assignmentVisible ?? true)) {
+        return true;
+      }
+    }
+    if (lockAt != null) {
+      print(
+          'lockAt: ${lockAt}, is before ${DateTime.now()}? ${DateTime.parse(lockAt).toLocal().isBefore(DateTime.now())}');
+      if (DateTime.parse(lockAt).toLocal().isBefore(DateTime.now())) {
+        return true;
+      }
+    } else if (dueAt != null) {
+      print(
+          'dueAt: ${dueAt}, is before ${DateTime.now()}? ${DateTime.parse(dueAt).toLocal().isBefore(DateTime.now())}');
+      if (DateTime.parse(dueAt).toLocal().isBefore(DateTime.now()) &&
+          lockedForUser) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

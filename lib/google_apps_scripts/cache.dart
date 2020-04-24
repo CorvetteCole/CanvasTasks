@@ -1,24 +1,22 @@
 @JS()
 library cache;
 
-import 'dart:js';
-
 import 'package:js/js.dart';
 
 @JS()
 class CacheService {
-  external Cache getDocumentCache();
+  external static Cache getDocumentCache();
 
-  external Cache getScriptCache();
+  external static Cache getScriptCache();
 
-  external Cache getUserCache();
+  external static Cache getUserCache();
 }
 
 @JS()
 class Cache {
   external String get(String key);
 
-  external JsObject getAll(List<String> keys);
+  external Object getAll(List<String> keys);
 
   external void put(String key, String value, [num expirationInSeconds]);
 

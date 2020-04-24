@@ -1,7 +1,7 @@
 @JS()
 library utilities;
 
-//import 'dart:js_util';
+import 'dart:js_util';
 
 import 'package:js/js.dart';
 
@@ -9,7 +9,7 @@ import 'package:js/js.dart';
 Map jsToMap(jsObject) {
   return Map.fromIterable(
     _getKeysOfObject(jsObject),
-    //value: (key) => getProperty(jsObject, key),
+    value: (key) => getProperty(jsObject, key),
   );
 }
 

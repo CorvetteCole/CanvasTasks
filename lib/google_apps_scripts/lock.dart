@@ -5,11 +5,11 @@ import 'package:js/js.dart';
 
 @JS()
 class LockService {
-  external Lock getDocumentLock();
+  external static Lock getDocumentLock();
 
-  external Lock getScriptLock();
+  external static Lock getScriptLock();
 
-  external Lock getUserLock();
+  external static Lock getUserLock();
 }
 
 @JS()

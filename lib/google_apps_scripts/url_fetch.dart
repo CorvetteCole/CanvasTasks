@@ -13,7 +13,7 @@ class HTTPResponse {
   external Blob getBlob();
   external List<int> getContent();
   external String getContentText([String charset]);
-  external Object geHeaders();
+  external Object getHeaders();
   external int getResponseCode();
 }
 

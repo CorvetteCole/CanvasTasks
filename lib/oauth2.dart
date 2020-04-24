@@ -2,9 +2,9 @@
 library oauth2;
 
 import 'package:js/js.dart';
-import 'cache.dart';
-import 'lock.dart';
-import 'properties.dart';
+import 'google_apps_scripts/cache.dart';
+import 'google_apps_scripts/lock.dart';
+import 'google_apps_scripts/properties.dart';
 
 @JS()
 class OAuth2 {

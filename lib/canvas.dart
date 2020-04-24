@@ -58,7 +58,7 @@ class Canvas {
   }
 
   Future<Map<String, Set<Assignment>>> getAssignments(
-      {bool getFromCourse}) async {
+      {bool getFromCourse = false}) async {
     var assignments = <String, Set<Assignment>>{};
     if (getFromCourse) {
       var savedCourseIndexString =
@@ -81,7 +81,7 @@ class Canvas {
             assignmentsUpdatedKey, DateTime.now().toUtc().toIso8601String());
       }
     } else {
-      // TODO implement this
+      assignments = await _fetchAssignments();
     }
     return assignments;
   }
@@ -135,73 +135,36 @@ class Canvas {
               await _fetchAllAssignmentsFromCourse(courseId, pagination.next));
         }
       }
-//      headers.forEach((name, info){
-//        print('name: $name');
-//        print(info);
-//      });
-
     }
     return assignments;
   }
 
-  Future<Set<Assignment>> _fetchAssignments(Set<int> courseId) async {
-    //var assignments = <int, Assignment>{};
-    var assignments = <Assignment>{};
-    //var assignments = <Assignment>[];
-
-    var rawStringResponse;
-
-    var rawResponse = UrlFetchApp.fetch(
-      'https://uk.instructure.com/api/v1/courses/$courseID/assignments?include[]=all_dates&include[]=submission&order_by=due_at&per_page=100&access_token=$_canvasKey',
-    );
-    print(rawResponse.getAllHeaders());
-//  var rawResponse = UrlFetchApp.fetch(
-//    'https://uk.instructure.com/api/v1/courses/$courseID/assignments?include[]=all_dates&include[]=submission&bucket=upcoming&per_page=100&access_token=$canvas_key',
-//  );
-
-    rawStringResponse = rawResponse.getContentText();
-    var responseJsonList =
-        jsonDecode(await rawResponse.getContentText()) as List<dynamic>;
-
-//  rawResponse = UrlFetchApp.fetch(
-//    'https://uk.instructure.com/api/v1/courses/$courseID/assignments?include[]=all_dates&include[]=submission&bucket=undated&per_page=100&access_token=$canvas_key',
-//  );
-//  rawStringResponse = rawResponse.getContentText();
-//  responseJsonList
-//      .addAll(jsonDecode(await rawResponse.getContentText()) as List<dynamic>);
-
-//  rawResponse = UrlFetchApp.fetch(
-//    'https://uk.instructure.com/api/v1/courses/$courseID/assignments?include[]=all_dates&include[]=submission&bucket=future&per_page=100&access_token=$canvas_key',
-//  );
-//  responseJsonList
-//      .addAll(jsonDecode(await rawResponse.getContentText()) as List<dynamic>);
-
-    for (var response in responseJsonList) {
-      var assignment = Assignment.fromJson(response);
-      //print(assignment.name);
-      //print(assignment.submissionTypes);
-      //print(assignment.submission?.workflowState);
-      //print(assignment.submission.toJson());
-//    print('DateTime now: ${DateTime.now()}');
-      if (assignment.dueAt?.isNotEmpty ?? false) {
-//      print('dueAt: ${DateTime.parse(assignment.dueAt).toLocal()}');
-//      print(
-//          'should be added? ${DateTime.parse(assignment.dueAt).toLocal().isAfter(DateTime.now())}');
-//      if (DateTime.parse(assignment.dueAt).toLocal().isAfter(DateTime.now())) {
-        assignments.add(assignment);
-//      }
-      } else if (assignment.lockAt?.isNotEmpty ?? false) {
-//      print('lockAt: ${DateTime.parse(assignment.lockAt).toLocal()}');
-//      print(
-//          'should be added? ${DateTime.parse(assignment.lockAt).toLocal().isAfter(DateTime.now())}');
-//      if (DateTime.parse(assignment.lockAt).toLocal().isAfter(DateTime.now())) {
-        assignments.add(assignment);
-//      }
-      }
-      //print(assignments.last.name);
+  Future<Map<String, Set<Assignment>>> _fetchAssignments() async {
+    var assignments = <String, Set<Assignment>>{};
+    var urls = <String>[];
+    for (var courseId in _courses.keys) {
+      print('adding URL to list');
+      urls.add(
+          'https://uk.instructure.com/api/v1/courses/$courseId/assignments?include[]=all_dates&include[]=submission&order_by=due_at&per_page=25&access_token=$_canvasKey');
     }
-
-    //DriveApp.createFile('CanvasTasksResponse${courseID}.txt', rawStringResponse);
+    var rawResponses = UrlFetchApp.fetchAll(urls);
+    var index = 0;
+    for (var rawResponse in rawResponses) {
+      print('parsing rawResponse $index');
+      var responseJsonList =
+          jsonDecode(await rawResponse.getContentText()) as List<dynamic>;
+      var assignmentsSet = <Assignment>{};
+      for (var response in responseJsonList) {
+        var assignment = Assignment.fromJson(response);
+        // only add assignments with dates attached
+        if ((assignment.dueAt?.isNotEmpty ?? false) ||
+            (assignment.lockAt?.isNotEmpty ?? false)) {
+          assignmentsSet.add(assignment);
+        }
+      }
+      assignments[_courses.values.elementAt(index)] = assignmentsSet;
+      index++;
+    }
     return assignments;
   }
 }

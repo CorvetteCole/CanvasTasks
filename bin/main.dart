@@ -56,7 +56,6 @@ void main() async {
     }
     switch (getGoal()) {
       case Goal.updateRecentAssignments:
-        // TODO: Handle this case.
         print('update recent assignments');
         addToTasks(await canvas.getAssignments(), getCanvasTaskListId());
         break;

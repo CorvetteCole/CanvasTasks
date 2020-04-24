@@ -33,18 +33,6 @@ class Tasklists {
   external static void remove(String id);
 }
 
-//@JS()
-//@anonymous
-//class Object {
-//  external num get maxResults;
-//  external String get pageToken;
-//  external String get parent;
-//  external String get previous;
-//
-//  external factory Object(
-//      {num maxResults, String pageToken, String parent, String previous});
-//}
-
 @JS()
 class Tasklist {
   external String get etag;
@@ -67,16 +55,9 @@ class Tasklist {
 
   external set title(String title);
 
-  // somehow merge this with updatedDate
   external String get updated;
 
   external set updated(String updated);
-
-//  DateTime get lastUpdated => DateTime.parse(updated);
-//  set lastUpdated(DateTime dateTime){
-//    updated = dateTime.toIso8601String();
-//  }
-//DateTime get updatedDate => DateTime.parse(updated);
 }
 
 // https://developers.google.com/tasks/v1/reference/tasks
@@ -202,24 +183,13 @@ class Task {
 
   external set due(String due);
 
-//  set dueDate(DateTime dateTime){
-//    due = dateTime.toIso8601String();
-//  }
-
   external String get completed;
 
   external set completed(String completed);
 
-//  set completedDate(DateTime dateTime){
-//    completed = dateTime.toIso8601String();
-//  }
-
   external String get updated;
 
   external set updated(String updated);
-//  set updatedDate(DateTime dateTime){
-//    updated = dateTime.toIso8601String();
-//  }
 }
 
 @JS()

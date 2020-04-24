@@ -20,6 +20,6 @@ class HTTPResponse {
 @JS()
 class UrlFetchApp {
   external static HTTPResponse fetch(String url, [Object params]);
-  external static List<HTTPResponse> fetchAll(Object requests);
+  external static List<HTTPResponse> fetchAll(List<String> url);
   external static Object getRequest(String url, [Object params]);
 }

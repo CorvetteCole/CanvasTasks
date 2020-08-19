@@ -145,7 +145,7 @@ class Canvas {
     for (var courseId in _courses.keys) {
       print('adding URL to list');
       urls.add(
-          'https://uk.instructure.com/api/v1/courses/$courseId/assignments?include[]=all_dates&include[]=submission&order_by=due_at&per_page=25&access_token=$_canvasKey');
+          'https://uk.instructure.com/api/v1/courses/$courseId/assignments?include[]=all_dates&include[]=submission&per_page=25&access_token=$_canvasKey');
     }
     var rawResponses = UrlFetchApp.fetchAll(urls);
     var index = 0;

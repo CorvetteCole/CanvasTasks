@@ -20,7 +20,7 @@ import 'package:tuple/tuple.dart';
 
 //import 'package:http/http.dart' as http;
 
-const int termId = 10556;
+const int termId = 10597;
 
 const String coursesUpdatedKey = 'courses_updated';
 const int coursesUpdateInterval = 7;
@@ -74,7 +74,7 @@ bool shouldUpdateCourses() {
   var coursesUpdated = properties.getProperty(coursesUpdatedKey);
   return coursesUpdated == null ||
       DateTime.parse(coursesUpdated).difference(DateTime.now()) >
-          Duration(days: assignmentsFullUpdateInterval);
+         Duration(days: coursesUpdateInterval);
 }
 
 String getCanvasTaskListId() {
@@ -171,11 +171,10 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
   //TODO: sort so closest date is at top
   for (var taskTuple in tasks.values) {
     // check if tasks need to be updated, if so, update them
-    //TODO, build method to convert due here to how Tasks interprets it (i.e. throw away the time info)
-    //TODO, right now this will update every task every time since the due dates are always different
     if (taskTuple.item2 != null &&
         (taskTuple.item1.notes != taskTuple.item2.notes ||
-            taskTuple.item1.due != taskTuple.item2.due ||
+            DateTime.parse(taskTuple.item1.due).day !=
+                DateTime.parse(taskTuple.item2.due).day ||
             taskTuple.item1.status != taskTuple.item2.status)) {
       taskTuple.item2.notes = taskTuple.item1.notes;
       taskTuple.item2.due = taskTuple.item1.due;

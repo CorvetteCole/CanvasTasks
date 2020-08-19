@@ -55,7 +55,18 @@ class Course {
   bool isFavorite;
   bool isConcluded;
 
-  String get courseCodeTruncated => courseCode.trim().substring(0, 5);
+  String get courseCodeTruncated {
+    var truncated = '';
+    if (!RegExp(r'[0-9]')
+        .hasMatch(courseCode.trim().substring(0, 3))) {
+      // handle 3 letter course codes
+      truncated = courseCode.trim().substring(0, 6);
+    } else {
+      truncated = courseCode.trim().substring(0, 5);
+    }
+    print('full course code: $courseCode, truncated: $truncated');
+    return truncated;
+  }
 
   Course(
       {this.id,
@@ -171,7 +182,6 @@ class Course {
             : null;
     isFavorite = json['is_favorite'];
     isConcluded = json['concluded'];
-    
   }
 
   Map<String, dynamic> toJson() {

@@ -19,6 +19,7 @@ import 'package:CanvasTasks/secrets.dart';
 import 'package:tuple/tuple.dart';
 
 //import 'package:http/http.dart' as http;
+import 'package:html/parser.dart';
 
 const int termId = 10597;
 
@@ -101,6 +102,39 @@ Goal getGoal() {
   }
 }
 
+// TODO doesn't work
+String parseDescription(String description){
+  String totalText;
+  try {
+    var document = parse(description);
+    var paragraphElements = document.getElementsByTagName('p');
+    var headerElements = document.getElementsByTagName('h1');
+    for (var i = 2; i < 7; i++) { // 2 through 6
+      headerElements.addAll(document.getElementsByTagName('h$i'));
+    }
+    var textElements = document.getElementsByTagName('text');
+
+    for (var element in headerElements) {
+      totalText += element.children[0].text;
+      totalText += '\n';
+    }
+
+    for (var element in paragraphElements) {
+      totalText += element.children[0].text;
+      totalText += '\n';
+    }
+
+    for (var element in textElements) {
+      totalText += element.children[0].text;
+      totalText += '\n';
+    }
+  } catch (e){
+    print(e);
+  }
+
+  return totalText;
+}
+
 // TODO move this method to its own class, split up the internals
 void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
   var tasks = <String, Tuple2<Task, Task>>{};
@@ -109,7 +143,7 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
     for (var assignment in assignments[courseName]) {
       var newTask = Task()
         ..title = '$courseName: ${assignment.name}'
-        ..notes = assignment.description
+        ..notes = parseDescription(assignment.description)
         ..due = assignment.dueAt;
 
       // get task status
@@ -139,7 +173,7 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
     }
   }
 
-  List<Task> getTasks(String taskLisId, {String nextPageToken}) {
+  List<Task> getTasks(String taskListId, {String nextPageToken}) {
     var taskList = nextPageToken != null
         ? Tasks.list(
             taskListId,
@@ -168,7 +202,6 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
     }
   }
 
-  //TODO: sort so closest date is at top
   for (var taskTuple in tasks.values) {
     // check if tasks need to be updated, if so, update them
     if (taskTuple.item2 != null &&
@@ -185,6 +218,7 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
       Tasks.update(taskTuple.item2, taskListId, taskTuple.item2.id);
     } else if (taskTuple.item2 == null) {
       print('task ${taskTuple.item1.title} does not exist, inserting...');
+      print('task to add, title: ${taskTuple.item1.title}, due date: ${taskTuple.item1.due}, notes: ${taskTuple.item1.notes}');
       Tasks.insert(taskTuple.item1, taskListId);
     }
   }

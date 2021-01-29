@@ -17,11 +17,12 @@ import 'package:CanvasTasks/google_apps_scripts/cache.dart';
 import 'package:google_apps/drive.dart';
 import 'package:CanvasTasks/secrets.dart';
 import 'package:tuple/tuple.dart';
+import 'package:intl/intl.dart';
 
 //import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 
-const int termId = 10597;
+const int termId = 10632;
 
 const String coursesUpdatedKey = 'courses_updated';
 const int coursesUpdateInterval = 7;
@@ -102,37 +103,42 @@ Goal getGoal() {
   }
 }
 
-// TODO doesn't work
-String parseDescription(String description){
-  String totalText;
-  try {
-    var document = parse(description);
-    var paragraphElements = document.getElementsByTagName('p');
-    var headerElements = document.getElementsByTagName('h1');
-    for (var i = 2; i < 7; i++) { // 2 through 6
-      headerElements.addAll(document.getElementsByTagName('h$i'));
-    }
-    var textElements = document.getElementsByTagName('text');
 
-    for (var element in headerElements) {
-      totalText += element.children[0].text;
-      totalText += '\n';
-    }
+String parseDescription(Assignment assignment){
+  var dueDate = DateTime.parse(assignment.dueAt);
+  dueDate = dueDate.toLocal();
+  //dueDate = DateTime.fromMillisecondsSinceEpoch(dueDate.millisecondsSinceEpoch + Duration(hours: 3).inMilliseconds); // add 3 hours for timezone offsetting
+  return 'due at ${DateFormat.jm('en_US').format(dueDate)}';
 
-    for (var element in paragraphElements) {
-      totalText += element.children[0].text;
-      totalText += '\n';
-    }
-
-    for (var element in textElements) {
-      totalText += element.children[0].text;
-      totalText += '\n';
-    }
-  } catch (e){
-    print(e);
-  }
-
-  return totalText;
+  // String totalText;
+  // try {
+  //   var document = parse(description);
+  //   var paragraphElements = document.getElementsByTagName('p');
+  //   var headerElements = document.getElementsByTagName('h1');
+  //   for (var i = 2; i < 7; i++) { // 2 through 6
+  //     headerElements.addAll(document.getElementsByTagName('h$i'));
+  //   }
+  //   var textElements = document.getElementsByTagName('text');
+  //
+  //   for (var element in headerElements) {
+  //     totalText += element.children[0].text;
+  //     totalText += '\n';
+  //   }
+  //
+  //   for (var element in paragraphElements) {
+  //     totalText += element.children[0].text;
+  //     totalText += '\n';
+  //   }
+  //
+  //   for (var element in textElements) {
+  //     totalText += element.children[0].text;
+  //     totalText += '\n';
+  //   }
+  // } catch (e){
+  //   print(e);
+  // }
+  //
+  // return totalText;
 }
 
 // TODO move this method to its own class, split up the internals
@@ -143,7 +149,7 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
     for (var assignment in assignments[courseName]) {
       var newTask = Task()
         ..title = '$courseName: ${assignment.name}'
-        ..notes = parseDescription(assignment.description)
+        ..notes = parseDescription(assignment)
         ..due = assignment.dueAt;
 
       // get task status

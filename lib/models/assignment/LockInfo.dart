@@ -18,7 +18,6 @@ class LockInfo {
     assetString = json['asset_string'];
     unlockAt = json['unlock_at'];
     lockAt = json['lock_at'];
-    contextModule = json['context_module'];
     manuallyLocked = json['manually_locked'];
     canView = json['can_view'];
   }
@@ -28,7 +27,6 @@ class LockInfo {
     data['asset_string'] = assetString;
     data['unlock_at'] = unlockAt;
     data['lock_at'] = lockAt;
-    data['context_module'] = contextModule;
     data['manually_locked'] = manuallyLocked;
     data['can_view'] = canView;
     return data;

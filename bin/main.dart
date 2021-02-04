@@ -105,7 +105,7 @@ Goal getGoal() {
 
 
 String parseDescription(Assignment assignment){
-  var dueDate = DateTime.parse(assignment.dueAt);
+  var dueDate = DateTime.parse(assignment.dueAt ?? assignment.lockAt ?? assignment.createdAt);
   dueDate = dueDate.toLocal();
   //dueDate = DateTime.fromMillisecondsSinceEpoch(dueDate.millisecondsSinceEpoch + Duration(hours: 3).inMilliseconds); // add 3 hours for timezone offsetting
   return 'due at ${DateFormat.jm('en_US').format(dueDate)}';
@@ -147,11 +147,11 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
   // create map of all tasks
   for (var courseName in assignments.keys) {
     for (var assignment in assignments[courseName]) {
+      print('assignment: ${assignment.name}');
       var newTask = Task()
         ..title = '$courseName: ${assignment.name}'
         ..notes = parseDescription(assignment)
-        ..due = assignment.dueAt;
-
+        ..due = assignment.dueAt ?? assignment.lockAt ?? assignment.createdAt;
       // get task status
       if (assignment.isComplete) {
         print('${assignment.name} is completed');
@@ -160,9 +160,10 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
         print('${assignment.name} is not completed');
       }
 
-      if (assignment.dueAt?.isEmpty ?? true) {
-        newTask.due = assignment.lockAt;
-      }
+      // TODO possibly redundant, remove if no bad things happen
+      // if (assignment.dueAt?.isEmpty ?? true) {
+      //   newTask.due = assignment.lockAt;
+      // }
 
       if (newTask.due != null) {
         newTask.due = DateTime.parse(newTask.due)
@@ -172,8 +173,10 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
             .toUtc()
             .toIso8601String();
       }
-//    print (
-//        '${newTask.title} due: ${newTask.due} locks: ${assignment.lockAt} submitted: ${assignment.hasSubmittedSubmissions}');
+
+
+    //print (
+    //    '${newTask.title} due: ${newTask.due} locks: ${assignment.lockAt} submitted: ${assignment.hasSubmittedSubmissions}');
 
       tasks[newTask.title] = Tuple2(newTask, null);
     }

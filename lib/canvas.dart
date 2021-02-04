@@ -5,6 +5,7 @@ import 'package:CanvasTasks/parse_link_header.dart';
 import 'package:CanvasTasks/utilities.dart';
 import 'package:google_apps/drive.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 
 import 'models/assignment/Assignment.dart';
@@ -123,7 +124,6 @@ class Canvas {
           assignments.add(assignment);
         }
       }
-
       var headers = jsToMap(rawResponse.getAllHeaders());
       if (headers.containsKey('Link')) {
         var pagination = Pagination.parse(headers['Link']);

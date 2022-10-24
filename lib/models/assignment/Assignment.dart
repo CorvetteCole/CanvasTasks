@@ -68,7 +68,7 @@ class Assignment {
   List<String> submissionTypes;
   bool hasSubmittedSubmissions;
   String gradingType;
-  String gradingStandardId;
+  int gradingStandardId;
   bool published;
   bool unpublishable;
   bool onlyVisibleToOverrides;

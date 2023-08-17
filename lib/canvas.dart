@@ -22,14 +22,13 @@ const String _courseIndexPropertyKey = 'course_index';
 const Duration _cacheExpiration = Duration(hours: 1);
 
 class Canvas {
-  final int _termId;
   final String _canvasKey;
   final bool _forceCourseUpdate;
   final Cache _cache;
   final Properties _properties;
   var _courses = <int, String>{};
 
-  Canvas(this._termId, this._canvasKey, this._cache, this._properties,
+  Canvas(this._canvasKey, this._cache, this._properties,
       [this._forceCourseUpdate = false]);
 
   // id, name
@@ -37,11 +36,21 @@ class Canvas {
     var cachedIds = _cache.get(_courseIdsCacheKey);
     var cachedNames = _cache.get(_courseNamesCacheKey);
     if (cachedIds == null || cachedNames == null || _forceCourseUpdate) {
+      // look for largest term id
+      var latestTermId = 0;
+      var latestTermName = '';
       for (var course in await _fetchCourses()) {
-        if (course.term.id == _termId) {
-          _courses[course.id] = course.courseCodeTruncated;
+        if (course.term.id > latestTermId) {
+          latestTermId = course.term.id;
+          latestTermName = course.term.name;
         }
+        _courses[course.id] = course.courseCodeTruncated;
       }
+
+      // filter _courses to only include courses from the latest term
+      _courses.removeWhere((key, value) => key != latestTermId);
+
+      print('latest term id: $latestTermId ($latestTermName)');
 
       _cache.put(_courseIdsCacheKey, _courses.keys.join(','),
           _cacheExpiration.inSeconds);

@@ -22,8 +22,6 @@ import 'package:intl/intl.dart';
 //import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 
-const int termId = 10632;
-
 const String coursesUpdatedKey = 'courses_updated';
 const int coursesUpdateInterval = 7;
 const int assignmentsFullUpdateInterval = 3;
@@ -34,7 +32,6 @@ var cache = CacheService.getUserCache();
 var properties = PropertiesService.getUserProperties();
 
 void main() async {
-  //print('hello!!!');
   var startTime = DateTime.now();
 
 //  var canvasTaskList = getCanvasTaskListId();
@@ -47,8 +44,8 @@ void main() async {
   var courseUpdateNeeded = shouldUpdateCourses();
 
   var canvas = courseUpdateNeeded
-      ? Canvas(termId, canvas_key, cache, properties, true)
-      : Canvas(termId, canvas_key, cache, properties, false);
+      ? Canvas(canvas_key, cache, properties, true)
+      : Canvas(canvas_key, cache, properties, false);
 
   if (await canvas.courses > 0) {
     if (courseUpdateNeeded) {
@@ -224,6 +221,7 @@ void addToTasks(Map<String, Set<Assignment>> assignments, String taskListId) {
       if (taskTuple.item2.status != TaskStatus.completed.toShortString()) {
         taskTuple.item2.status = taskTuple.item1.status;
       }
+      print('task ${taskTuple.item1.title} is being updated...');
       Tasks.update(taskTuple.item2, taskListId, taskTuple.item2.id);
     } else if (taskTuple.item2 == null) {
       print('task ${taskTuple.item1.title} does not exist, inserting...');

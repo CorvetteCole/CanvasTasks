@@ -35,20 +35,31 @@ class Canvas {
   Future<int> get courses async {
     var cachedIds = _cache.get(_courseIdsCacheKey);
     var cachedNames = _cache.get(_courseNamesCacheKey);
-    if (cachedIds == null || cachedNames == null || _forceCourseUpdate) {
+    print('cachedIds: $cachedIds, cachedNames: $cachedNames');
+    if (cachedIds.isEmpty || cachedNames.isEmpty || _forceCourseUpdate) {
+      print('updating courses...');
       // look for largest term id
       var latestTermId = 0;
       var latestTermName = '';
+
+      // temp courses object to hold termId, name and course id
+      var tempCourses = <int, Tuple2<int, String>>{};
+
       for (var course in await _fetchCourses()) {
         if (course.term.id > latestTermId) {
           latestTermId = course.term.id;
           latestTermName = course.term.name;
         }
-        _courses[course.id] = course.courseCodeTruncated;
+        tempCourses[course.id] = Tuple2(course.term.id, course.courseCodeTruncated);
       }
 
-      // filter _courses to only include courses from the latest term
-      _courses.removeWhere((key, value) => key != latestTermId);
+
+      // add courses from tempCourses to _courses if they are from the latest term
+      for (var course in tempCourses.entries) {
+        if (course.value.item1 == latestTermId) {
+          _courses[course.key] = course.value.item2;
+        }
+      }
 
       print('latest term id: $latestTermId ($latestTermName)');
 
@@ -57,6 +68,7 @@ class Canvas {
       _cache.put(_courseNamesCacheKey, _courses.values.join(','),
           _cacheExpiration.inSeconds);
     } else {
+      print('using cached courses');
       var idSet = cachedIds.split(',').map((id) => int.parse(id)).toSet();
       var nameSet = cachedNames.split(',').toSet();
 

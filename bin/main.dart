@@ -41,8 +41,10 @@ void main() async {
 //  }
 // properties.deleteAllProperties();
 
+  print('checking if course update needed');
   var courseUpdateNeeded = shouldUpdateCourses();
 
+  print('initailizing canvas...');
   var canvas = courseUpdateNeeded
       ? Canvas(canvas_key, cache, properties, true)
       : Canvas(canvas_key, cache, properties, false);
@@ -71,6 +73,7 @@ void main() async {
 
 bool shouldUpdateCourses() {
   var coursesUpdated = properties.getProperty(coursesUpdatedKey);
+  print('courses updated: $coursesUpdated');
   return coursesUpdated == null ||
       DateTime.parse(coursesUpdated).difference(DateTime.now()) >
          Duration(days: coursesUpdateInterval);

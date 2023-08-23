@@ -36,7 +36,11 @@ class Canvas {
     var cachedIds = _cache.get(_courseIdsCacheKey);
     var cachedNames = _cache.get(_courseNamesCacheKey);
     print('cachedIds: $cachedIds, cachedNames: $cachedNames');
-    if (cachedIds.isEmpty || cachedNames.isEmpty || _forceCourseUpdate) {
+    if (cachedIds == null ||
+        cachedNames == null ||
+        cachedIds.isEmpty ||
+        cachedNames.isEmpty ||
+        _forceCourseUpdate) {
       print('updating courses...');
       // look for largest term id
       var latestTermId = 0;
@@ -50,9 +54,9 @@ class Canvas {
           latestTermId = course.term.id;
           latestTermName = course.term.name;
         }
-        tempCourses[course.id] = Tuple2(course.term.id, course.courseCodeTruncated);
+        tempCourses[course.id] =
+            Tuple2(course.term.id, course.courseCodeTruncated);
       }
-
 
       // add courses from tempCourses to _courses if they are from the latest term
       for (var course in tempCourses.entries) {
